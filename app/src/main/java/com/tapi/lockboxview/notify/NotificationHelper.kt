@@ -32,6 +32,12 @@ object NotificationHelper {
             "Subtitle String"
         )
 
+        val notificationExpanded = createBatteryNotificationExpanded(
+            context,
+            "Title notifications",
+            "Subtitle String"
+        )
+
         val intentToMain = Intent(context, MainActivity::class.java)
         intentToMain.addCategory(Intent.CATEGORY_LAUNCHER)
         intentToMain.action = Intent.ACTION_MAIN
@@ -43,7 +49,7 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(false)
             .setCustomContentView(notificationLayout)
-            .setCustomBigContentView(notificationLayout)
+            .setCustomBigContentView(notificationExpanded)
             .build()
 
         val notificationManager = NotificationManagerCompat.from(context)
@@ -55,6 +61,57 @@ object NotificationHelper {
             id = notiId,
             notification = notification
         )
+    }
+
+    fun createBatteryModeNotification2(
+        context: Context, channelId: String, notiId: Int
+    ) {
+        val notificationLayout = createBatteryNotificationLayout(
+            context,
+            "Title notifications",
+            "Subtitle String"
+        )
+
+        val notificationExpanded = createBatteryNotificationExpanded(
+            context,
+            "Title notifications",
+            "Subtitle String"
+        )
+
+        val intentToMain = Intent(context, MainActivity::class.java)
+        intentToMain.addCategory(Intent.CATEGORY_LAUNCHER)
+        intentToMain.action = Intent.ACTION_MAIN
+        intentToMain.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+        val pendingIntent = PendingIntent.getActivity(
+            context, 0, intentToMain, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val builder = Notification.Builder(context, channelId)
+            .setSmallIcon(R.drawable.power_saver_smart_icon)
+            .setPriority(Notification.PRIORITY_HIGH)
+            .setAutoCancel(false)
+            .setContentIntent(pendingIntent)
+            .setCustomContentView(notificationLayout)
+            .setCustomBigContentView(notificationExpanded)
+
+        // For compatibility with Android Oreo and above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Battery Mode Notification",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = builder.build()
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.notify(notiId, notification)
     }
 
     private fun setChannelIdWith(

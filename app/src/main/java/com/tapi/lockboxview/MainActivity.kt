@@ -20,7 +20,6 @@ import com.tapi.lockboxview.notify.NotificationHelper
 
 class MainActivity : AppCompatActivity() {
 
-
     var btView: AppCompatTextView? = null
     var requestBtn: AppCompatButton? = null
     var pushBtn: AppCompatButton? = null
@@ -51,12 +50,15 @@ class MainActivity : AppCompatActivity() {
             NotificationHelper.createBatteryModeNotification(this, "channel 1", 1)
         }
         permissionBtn?.setOnClickListener {
-            NotificationHelper.createBatteryModeNotification(this, "channel 2", 2)
+            NotificationHelper.createBatteryModeNotification2(this, "channel 2", 2)
 
-          /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 pushNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-            }*/
+            }
         }
+
+        val result = getRowOf(5, 2)
+        Log.d("ManhNQ", "onCreate: $result")
     }
 
 
@@ -194,4 +196,63 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun getRowOf(totalCount: Int, spanCount: Int): List<IndexType> {
+        val totalRow = (totalCount + spanCount - 1) / spanCount
+        val maxCount = totalRow * spanCount
+
+        val result = mutableListOf<IndexType>()
+
+        for (i in 0 until totalCount) {
+            val index = i + 1
+            val currentRow = currentRow(spanCount, index)
+            Log.d("ManhNQ", "getRowOf: $currentRow  - index $index")
+            if (currentRow == 1) {
+                if (totalRow == currentRow) {
+                    if (index % spanCount == 1) {
+                        result.add(IndexType.BOTTOM_LEFT)
+                    } else if (index % spanCount == 0) {
+                        result.add(IndexType.BOTTOM_RIGHT)
+                    } else {
+                        result.add(IndexType.NORMAL)
+                    }
+                } else {
+                    if (index % spanCount == 1) {
+                        result.add(IndexType.TOP_LEFT)
+                    } else if (index % spanCount == 0) {
+                        result.add(IndexType.TOP_RIGHT)
+                    } else {
+                        result.add(IndexType.NORMAL)
+                    }
+                }
+            } else if (currentRow > 1 && currentRow == totalRow) {
+                if (index % spanCount == 1) {
+                    result.add(IndexType.BOTTOM_LEFT)
+                } else if (index % spanCount == 0) {
+                    result.add(IndexType.BOTTOM_RIGHT)
+                } else {
+                    result.add(IndexType.NORMAL)
+                }
+            } else {
+                result.add(IndexType.NORMAL)
+            }
+        }
+
+        val remain = maxCount - totalCount
+        if (remain > 0) {
+            for (i in 0 until remain) {
+                result.add(IndexType.NONE)
+            }
+        }
+        return result
+
+    }
+    fun currentRow(spanCount: Int, currentIndex: Int): Int {
+        return (currentIndex + spanCount - 1) / spanCount
+    }
+
+
+}
+
+enum class IndexType {
+    TOP_LEFT, TOP_RIGHT, NORMAL, BOTTOM_LEFT, BOTTOM_RIGHT, NONE
 }
