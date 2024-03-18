@@ -21,6 +21,8 @@ class DownloadTask(
     private val uiHandler: Handler
 ) :
     Runnable {
+
+    private var currentProgress: Int = -1
     override fun run() {
         downloadImage(imageUrl = imageUrl)
     }
@@ -45,8 +47,14 @@ class DownloadTask(
                 fileOutputStream.write(buffer, 0, bytesRead)
 
                 val progress = (totalBytesRead * 100L / contentLength).toInt()
-                uiHandler.post { callBack.onProgress(percent = progress) }
-                Log.d("ManhNQ", "downloadImage: $progress")
+                uiHandler.post {
+                    if (currentProgress != progress) {
+                        callBack.onProgress(percent = progress)
+                        Log.d("ManhNQ", "downloadImage: $progress")
+                        currentProgress = progress
+                    }
+                }
+
             }
 
             input.close()

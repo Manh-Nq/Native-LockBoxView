@@ -2,19 +2,23 @@ package com.tapi.lockboxview.service
 
 import android.app.Service
 import android.content.Intent
-import android.os.Environment
 import android.os.IBinder
 import android.util.Log
-import java.io.File
-import java.io.FileOutputStream
+import com.tapi.lockboxview.IServiceListener
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 
 class TestService : Service() {
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+
+    private var mBinder: IServiceListener.Stub = object : IServiceListener.Stub() {
+        override fun sendData(data: String?) {
+            Log.d("ManhNQ", "sendData: $data")
+        }
+
+    }
+
+    override fun onBind(intent: Intent?): IBinder {
+        return mBinder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -22,19 +26,19 @@ class TestService : Service() {
             val imageUrl = intent.getStringExtra("KEY_URL")
             try {
                 if (imageUrl != null) {
-                   DownloadService.downloadImage(imageUrl,object :OnDownloadCallBack{
-                       override fun onProgress(percent: Int) {
-                           Log.d("ManHNQ", "onProgress: ")
-                       }
+                    DownloadService.downloadImage(imageUrl, object : OnDownloadCallBack {
+                        override fun onProgress(percent: Int) {
+                            Log.d("ManHNQ", "onProgress: ")
+                        }
 
-                       override fun onComplete() {
-                           Log.d("ManHNQ", "onComplete: ")
-                       }
+                        override fun onComplete() {
+                            Log.d("ManHNQ", "onComplete: ")
+                        }
 
-                       override fun onFailed() {
-                           Log.d("ManHNQ", "onFailed: ")
-                       }
-                   })
+                        override fun onFailed() {
+                            Log.d("ManHNQ", "onFailed: ")
+                        }
+                    })
                 }
             } catch (e: IOException) {
                 Log.e("ImageDownloadService", "Error downloading image", e)
@@ -42,8 +46,6 @@ class TestService : Service() {
         }
         return START_STICKY
     }
-
-
 
 
     override fun onCreate() {

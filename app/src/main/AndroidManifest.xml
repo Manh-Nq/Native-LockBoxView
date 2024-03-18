@@ -43,7 +43,14 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.TestService" />
+        <service
+            android:name=".service.TestService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.tapi.lockboxview.service.TestService.BIND" />
+            </intent-filter>
+        </service>
     </application>
 
 
